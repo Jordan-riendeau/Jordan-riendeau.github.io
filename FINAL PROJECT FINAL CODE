@@ -1,0 +1,757 @@
+var currentScene = 0; // Class
+
+var numShips = 120; // number of ships
+
+var lives= 3; // Starting lives
+
+var nextScore = 1; // 1= score at top: 2 = score at bottom
+
+var stillPlaying = true;
+
+var pastShips = 0;
+
+var ships = []; //array to make ships
+
+var score = 0; // Starting Score
+
+var con = 1; // For the constrain to anchor bitmojis to the same height as each other
+
+//ohNoes that have reached end distance (assumption no removal interference)
+var frame= 60;
+frameRate(frame);
+
+var topMoverYpos = 100;
+var bottomMoverYpos= 300;
+//make frame rate only affect ohNOes
+ 
+
+//begin Jasmne Bit emoji
+//import draw bit emoji
+//innermost functions
+var drawBackHair = function(bitmojiX, bitmojiY, bitmojiH){
+    var brownHair = color(66, 38, 5); //set color
+    noStroke(); //remove stroke
+    fill(brownHair); //fill main hair color 
+    ellipse(bitmojiX-(bitmojiH/150*25),bitmojiY-(bitmojiH/150*62),(bitmojiH/150*96),(bitmojiH/150*63)); //hair back top
+    ellipse(bitmojiX-(bitmojiH/150*25),bitmojiY-(bitmojiH/150*31),(bitmojiH/150*116),(bitmojiH/150*64)); //hair back mid
+    ellipse(bitmojiX-(bitmojiH/150*25),bitmojiY+(bitmojiH/150*5),(bitmojiH/150*139),(bitmojiH/150*78)); //hair back bottom
+    fill(41, 22, 0); //fill hair back bottom color
+    ellipse(bitmojiX-(bitmojiH/150*25),bitmojiY+(bitmojiH/150*5),(bitmojiH/150*73),(bitmojiH/150*76)); //hair back bottom
+};
+
+var drawBackSEHair = function(bitmojiX, bitmojiY, bitmojiH){
+    var brownHair = color(66, 38, 5); //set color
+    noStroke(); //remove stroke
+    fill(brownHair); //fill main hair color 
+    //ellipse(bitmojiX-(bitmojiH/150*25),bitmojiY-(bitmojiH/150*62),(bitmojiH/150*96),(bitmojiH/150*63)); //hair back top
+    ellipse(bitmojiX-(bitmojiH/150*25),bitmojiY-(bitmojiH/150*16),(bitmojiH/150*106),(bitmojiH/150*65)); //hair back mid
+    ellipse(bitmojiX-(bitmojiH/150*38),bitmojiY+(bitmojiH/150*14),(bitmojiH/150*144),(bitmojiH/150*67)); //hair back bottom
+    fill(41, 22, 0); //fill hair back bottom color
+    //ellipse(bitmojiX-(bitmojiH/150*25),bitmojiY+(bitmojiH/150*5),(bitmojiH/150*73),(bitmojiH/150*76)); //hair back bottom
+};
+
+var drawCoat = function(bitmojiX, bitmojiY, bitmojiH){
+    noStroke(); //remove stroke
+    var shirtCloth =color(13, 11, 115); //set color
+    fill(shirtCloth); //fill shirt color
+    arc(bitmojiX-(bitmojiH/150*25),bitmojiY+(bitmojiH/150*50),(bitmojiH/150*116),(bitmojiH/150*-91),0, 180); //shirt
+    textAlign(LEFT, BASELINE); //text align
+    textSize(bitmojiH/150*28); //textSize
+    fill(157, 134, 235); //text color
+    text("JS", bitmojiX-(bitmojiH/150*41) ,bitmojiY+(bitmojiH/150*44)); //JS Label text
+};
+
+var drawSECoat = function(bitmojiX, bitmojiY, bitmojiH){
+    noStroke(); //remove stroke
+    var shirtCloth =color(13, 11, 115); //set color
+    fill(shirtCloth); //fill shirt color
+    arc(bitmojiX-(bitmojiH/150*25),bitmojiY+(bitmojiH/150*50),(bitmojiH/150*135),(bitmojiH/150*-59),0, 180); //shirt
+    textAlign(LEFT, BASELINE); //text align
+    textSize(bitmojiH/150*28); //textSize
+    fill(157, 134, 235); //text color
+    text("JS", bitmojiX-(bitmojiH/150*41) ,bitmojiY+(bitmojiH/150*44)); //JS Label text
+};
+    
+var drawNeck = function(bitmojiX, bitmojiY, bitmojiH){
+    noStroke(); //remove stroke
+    fill(125, 79, 46); //neck color
+    rect(bitmojiX-(bitmojiH/150*48),bitmojiY-(bitmojiH/150*17),bitmojiH/150*45,bitmojiH/150*34,bitmojiH/150*5); //neck
+};
+
+var drawFace = function(bitmojiX, bitmojiY, bitmojiH){
+    var skinTone = color(199, 123, 76); //set color
+    noStroke(); //remove stroke
+    fill(skinTone); //fill main skin color
+    ellipse(bitmojiX-(bitmojiH/150*25),bitmojiY-(bitmojiH/150*30),bitmojiH/150*75,bitmojiH/150*91); //head
+    stroke(59, 41, 41); //setting face stroke color
+    strokeWeight(bitmojiH/150*3); //setting face stroke weight
+    arc(bitmojiX-(bitmojiH/150*25),bitmojiY-(bitmojiH/150*9),bitmojiH/150*26,bitmojiH/150*10,0, 180); //mouth
+    line(bitmojiX-(bitmojiH/150*25),bitmojiY-(bitmojiH/150*34),bitmojiX-(bitmojiH/150*25),bitmojiY-(bitmojiH/150*18)); //nose
+    line(bitmojiX-(bitmojiH/150*54),bitmojiY-(bitmojiH/150*41),bitmojiX-(bitmojiH/150*33),bitmojiY-(bitmojiH/150*40)); //eyebrow left
+    line(bitmojiX+(bitmojiH/150*6),bitmojiY-(bitmojiH/150*41),bitmojiX-(bitmojiH/150*14),bitmojiY-(bitmojiH/150*40)); //eyebrow right
+    fill(115, 67, 13);//eye color
+    ellipse(bitmojiX-(bitmojiH/150*42),bitmojiY-(bitmojiH/150*31),bitmojiH/150*10,bitmojiH/150*10); //eye left
+    ellipse(bitmojiX-(bitmojiH/150*7),bitmojiY-(bitmojiH/150*31),bitmojiH/150*10,bitmojiH/150*10); //eye right
+    stroke(114, 78, 145); //setting glasses stroke color
+    strokeWeight(bitmojiH/150*3);// setting glasses stroke weight
+    noFill(); //removing fill from glasses
+    rect(bitmojiX-(bitmojiH/150*28),bitmojiY-(bitmojiH/150*29),(bitmojiH/150*6),(bitmojiH/150*2));//bridge of glasses
+    arc(bitmojiX-(bitmojiH/150*46),bitmojiY-(bitmojiH/150*31),(bitmojiH/150*36),(bitmojiH/150*29),0, 180); //glasses left
+    arc(bitmojiX-(bitmojiH/150*4),bitmojiY-(bitmojiH/150*31),bitmojiH/150*36,bitmojiH/150*29,0, 180); //glasses right
+};
+
+var drawFrontHair = function(bitmojiX, bitmojiY, bitmojiH){
+    var brownHair = color(66, 38, 5); //set color
+    noStroke(); //removing stroke from hair
+    fill(brownHair); //fill main hair color
+    ellipse(bitmojiX-(bitmojiH/150*13),bitmojiY-(bitmojiH/150*66),bitmojiH/150*63,bitmojiH/150*27); //hair front center
+    ellipse(bitmojiX+(bitmojiH/150*10),bitmojiY-(bitmojiH/150*43),bitmojiH/150*29,bitmojiH/150*68); //hair front right
+    ellipse(bitmojiX-(bitmojiH/150*62),bitmojiY-(bitmojiH/150*41),bitmojiH/150*25,bitmojiH/150*54); //hair front left
+};
+
+var drawHairPin = function(bitmojiX, bitmojiY, bitmojiH){
+    noStroke(); //remove stroke
+    fill(108, 85, 145); //hairpin color
+    rect(bitmojiX-(bitmojiH/150*14),bitmojiY-(bitmojiH/150*65),(bitmojiH/150*5),(bitmojiH/150*5),-(bitmojiH/150*12)); //hairpin design
+};
+
+//Higher layer of functions
+var drawBitmojiBody = function(bitmojiX, bitmojiY, bitmojiH) {
+    drawBackHair(bitmojiX, bitmojiY, bitmojiH);
+    drawCoat(bitmojiX, bitmojiY, bitmojiH);
+    drawNeck(bitmojiX, bitmojiY, bitmojiH);
+};
+
+var drawBitmojiSCBody = function(bitmojiX, bitmojiY, bitmojiH) {
+    drawBackSEHair(bitmojiX, bitmojiY, bitmojiH);
+    drawSECoat(bitmojiX, bitmojiY, bitmojiH);
+    //drawNeck(bitmojiX, bitmojiY, bitmojiH);
+};
+
+var drawBitmojiHead = function(bitmojiX, bitmojiY, bitmojiH) {
+    drawFace(bitmojiX, bitmojiY, bitmojiH);
+    drawFrontHair(bitmojiX, bitmojiY, bitmojiH);
+    drawHairPin(bitmojiX, bitmojiY, bitmojiH);
+};
+
+//Highest layer of function
+var drawBitEmoji= function(bitmojiX, bitmojiY, bitmojiH){
+    drawBitmojiBody(bitmojiX, bitmojiY, bitmojiH);
+    drawBitmojiHead(bitmojiX, bitmojiY, bitmojiH);
+};
+
+var drawBitSEmoji= function(bitmojiX, bitmojiY, bitmojiH){
+    var anchor = 1.9;
+    drawBitmojiSCBody(bitmojiX, bitmojiY, (bitmojiH) * anchor);
+    drawBitmojiHead(bitmojiX+2, bitmojiY+12, (bitmojiH-15) * anchor);
+};
+//Highest layer of new function
+var drawBitREmoji = function (x, y, h){
+    drawBitEmoji(x, y, h);
+};
+
+var drawBit70Emoji = function (x, y, h){
+    drawBitEmoji(x, y, 70); //height 70 hardcode interfers with buttons
+};
+
+//JsEmoji object type creation. Constructor function
+var JsEmoji = function(x, y) {
+    this.x = x;
+    this.y = y;
+    //this._ refers to the current object instance
+};
+
+JsEmoji.prototype.draw = function() {
+    this.y = constrain(this.y+con, 200, height - 60);
+    
+    for (var i = 0; i < ships.length; i++) {
+        if (this.x > ships[i].x-3 && this.x <= ships[i].x) {
+            score++;
+        }
+    }
+  
+    
+    if (keyIsPressed && keyCode === DOWN) {
+        drawBitSEmoji(this.x, this.y, 40, 40);
+        con = 10;
+    } else {
+        drawBit70Emoji(this.x, this.y, 40, 40);
+        con = 1;
+    }
+};
+
+var isJsJumping = false;
+JsEmoji.prototype.hop = function() {
+    this.y -= 200;
+    isJsJumping = true;
+};     
+ 
+JsEmoji.prototype.fall = function() {
+    this.y += (0.0000000001);
+    isJsJumping = false;
+};
+
+var jsEmoji = new JsEmoji(110, 350);
+
+
+
+
+//end
+
+
+
+
+
+
+//Ducking bitmoji
+var drawShirtDuck= function(bitmojiX,bitmojiY,bitmojiHeight)
+{
+    
+    noStroke();
+    // shirt
+    fill(186, 163, 163);
+    quad(bitmojiX+bitmojiHeight/100*15, bitmojiY+bitmojiHeight/100*50, bitmojiX+bitmojiHeight/100*60, bitmojiY+bitmojiHeight/100*105, bitmojiX-bitmojiHeight/100*60, bitmojiY+bitmojiHeight/100*105, bitmojiX-bitmojiHeight/100*25, bitmojiY+bitmojiHeight/100*60);
+};
+
+var drawHeadDuck= function(bitmojiX,bitmojiY,bitmojiHeight)
+{
+    //head
+    fill(255, 224, 189);
+    ellipse(bitmojiX+bitmojiHeight/100*32,bitmojiY+bitmojiHeight/100*44,bitmojiHeight/100*150,bitmojiHeight/100*150);
+};
+
+var drawEyesDuck= function(bitmojiX,bitmojiY,bitmojiHeight)
+{
+    //eyes
+    fill(247, 242, 242);
+    ellipse(bitmojiX+(bitmojiHeight/100*71),bitmojiY-bitmojiHeight/100*-40,bitmojiHeight/100*26,bitmojiHeight/100*18);// right eye
+    ellipse(bitmojiX-bitmojiHeight/100*-13,bitmojiY-bitmojiHeight/100*-19,bitmojiHeight/100*26,bitmojiHeight/100*18);// left eye
+    //right pupil
+    fill(94, 72, 30);
+    ellipse(bitmojiX+bitmojiHeight/100*71,bitmojiY-bitmojiHeight/100*-40,bitmojiHeight/100*14,bitmojiHeight/100*11);
+    fill(13, 11, 11);
+    ellipse(bitmojiX+bitmojiHeight/100*71,bitmojiY-bitmojiHeight/100*-40,bitmojiHeight/100*5,bitmojiHeight/100*5);
+    //left pupil
+    fill(94, 72, 30);
+    ellipse(bitmojiX-bitmojiHeight/100*-13,bitmojiY-bitmojiHeight/100*-19,bitmojiHeight/100*14,bitmojiHeight/100*10);
+    fill(13, 11, 11);
+    ellipse(bitmojiX-bitmojiHeight/100*-13,bitmojiY-bitmojiHeight/100*-18,bitmojiHeight/100*5,bitmojiHeight/100*5);
+};
+
+var drawMouthDuck= function(bitmojiX,bitmojiY,bitmojiHeight)
+{
+    //mouth
+    fill(255, 255, 255);
+    arc(bitmojiX+bitmojiHeight/100*17, bitmojiY+bitmojiHeight/100*80, bitmojiHeight/100*80, bitmojiHeight/100*50, 35, 215);
+    stroke(0, 0, 0);
+    line(bitmojiX+bitmojiHeight/100*36,bitmojiY+bitmojiHeight/100*101,bitmojiX-bitmojiHeight/100*20,bitmojiY+bitmojiHeight/100*76);
+};
+
+var drawHatDuck= function(bitmojiX,bitmojiY,bitmojiHeight)
+{
+    //hat & nose
+    fill(72, 242, 239);
+    arc(bitmojiX+bitmojiHeight/100*38, bitmojiY-bitmojiHeight/100*-16, bitmojiHeight/100*155, bitmojiHeight/100*-100, -22, 160);
+    fill(13, 13, 12);
+    arc(bitmojiX+bitmojiHeight/100*40, bitmojiY-bitmojiHeight/100*-14, bitmojiHeight/100*49, bitmojiHeight/100*-30, -22, 160);
+    strokeWeight(bitmojiHeight/100*1/2);
+    //nose
+    fill(255, 224, 189);
+    bezier(bitmojiX+bitmojiHeight/100*40, bitmojiY+bitmojiHeight/100*55, bitmojiX+bitmojiHeight/100*10, bitmojiY+bitmojiHeight/100*66, bitmojiX-bitmojiHeight/100*-1, bitmojiY+bitmojiHeight/100*46, bitmojiX-bitmojiHeight/100*-18, bitmojiY+bitmojiHeight/100*45);
+};
+
+var drawInitialsDuck= function(bitmojiX,bitmojiY,bitmojiHeight)
+{
+    // initials
+    fill(22, 201, 201);
+    textAlign(LEFT, BASELINE);
+    textSize(bitmojiHeight/100*30);
+    text("JR",bitmojiX-bitmojiHeight/100*20, bitmojiY+bitmojiHeight/100*100);
+};
+
+var drawBitmojiDuck= function(bitmojiX,bitmojiY,bitmojiHeight)
+{
+    drawShirtDuck(bitmojiX,bitmojiY,bitmojiHeight);
+    drawInitialsDuck(bitmojiX,bitmojiY,bitmojiHeight);
+    drawHeadDuck(bitmojiX,bitmojiY,bitmojiHeight);
+    drawEyesDuck(bitmojiX,bitmojiY,bitmojiHeight);
+    drawMouthDuck(bitmojiX,bitmojiY,bitmojiHeight);
+    drawHatDuck(bitmojiX,bitmojiY,bitmojiHeight);
+};
+
+
+//Jordan's Bitmojis
+
+var drawShirt= function(bitmojiX,bitmojiY,bitmojiHeight)
+{
+    
+    noStroke();
+    // shirt
+    fill(186, 163, 163);
+    quad(bitmojiX+(bitmojiHeight/100*15), bitmojiY+(bitmojiHeight/100*50), bitmojiX+(bitmojiHeight/100*60), bitmojiY+(bitmojiHeight/100*105), bitmojiX-bitmojiHeight/100*60, bitmojiY+bitmojiHeight/100*105, bitmojiX-bitmojiHeight/100*25, bitmojiY+bitmojiHeight/100*60);
+};
+
+var drawHead= function(bitmojiX,bitmojiY,bitmojiHeight)
+{
+    //head
+    fill(255, 224, 189);
+    ellipse(bitmojiX,bitmojiY,bitmojiHeight/100*150,bitmojiHeight/100*150);
+};
+
+var drawEyes= function(bitmojiX,bitmojiY,bitmojiHeight)
+{
+    //eyes
+    fill(247, 242, 242);
+    ellipse(bitmojiX+bitmojiHeight/100*35,bitmojiY-bitmojiHeight/100*20,bitmojiHeight/100*26,bitmojiHeight/100*18);// right eye
+    ellipse(bitmojiX-bitmojiHeight/100*30,bitmojiY-bitmojiHeight/100*20,bitmojiHeight/100*26,bitmojiHeight/100*18);// left eye
+    //right pupil
+    fill(94, 72, 30);
+    ellipse(bitmojiX+bitmojiHeight/100*35,bitmojiY-bitmojiHeight/100*20,bitmojiHeight/100*14,bitmojiHeight/100*11);
+    fill(13, 11, 11);
+    ellipse(bitmojiX+bitmojiHeight/100*35,bitmojiY-bitmojiHeight/100*20,bitmojiHeight/100*5,bitmojiHeight/100*5);
+    //left pupil
+    fill(94, 72, 30);
+    ellipse(bitmojiX-bitmojiHeight/100*30,bitmojiY-bitmojiHeight/100*20,bitmojiHeight/100*14,bitmojiHeight/100*11);
+    fill(13, 11, 11);
+    ellipse(bitmojiX-bitmojiHeight/100*30,bitmojiY-bitmojiHeight/100*20,bitmojiHeight/100*5,bitmojiHeight/100*5);
+};
+
+var drawMouth= function(bitmojiX,bitmojiY,bitmojiHeight)
+{
+    //mouth
+    fill(255, 255, 255);
+    arc(bitmojiX, bitmojiY+bitmojiHeight/100*32, bitmojiHeight/100*80, bitmojiHeight/100*54, 0, 180);
+    stroke(0, 0, 0);
+    line(bitmojiX+bitmojiHeight/100*37,bitmojiY+bitmojiHeight/100*41,bitmojiX-bitmojiHeight/100*38,bitmojiY+bitmojiHeight/100*41);
+};
+
+var drawHat= function(bitmojiX,bitmojiY,bitmojiHeight)
+{
+    //hat & nose
+    fill(72, 242, 239);
+    arc(bitmojiX, bitmojiY-bitmojiHeight/100*30, bitmojiHeight/100*150, bitmojiHeight/100*-100, 0, 180);
+    fill(13, 13, 12);
+    arc(bitmojiX, bitmojiY-bitmojiHeight/100*42, bitmojiHeight/100*49, bitmojiHeight/100*-39, 0, 180);
+    strokeWeight(bitmojiHeight/100*1/2);
+    fill(255, 224, 189);
+    bezier(bitmojiX+2, bitmojiY+bitmojiHeight/100*8, bitmojiX+bitmojiHeight/100*11, bitmojiY+bitmojiHeight/100*18, bitmojiX-bitmojiHeight/100*32, bitmojiY+bitmojiHeight/100*14, bitmojiX-bitmojiHeight/100*12, bitmojiY);
+};
+
+var drawInitials= function(bitmojiX,bitmojiY,bitmojiHeight)
+{
+    // initials
+    fill(22, 201, 201);
+    textAlign(LEFT, BASELINE);
+    textSize(bitmojiHeight/100*30);
+    text("JR",bitmojiX-bitmojiHeight/100*20, bitmojiY+bitmojiHeight/100*100);
+};
+
+var drawBitmoji= function(bitmojiX,bitmojiY,bitmojiHeight)
+{
+    drawShirt(bitmojiX,bitmojiY,bitmojiHeight);
+    drawInitials(bitmojiX,bitmojiY,bitmojiHeight);
+    drawHead(bitmojiX,bitmojiY,bitmojiHeight);
+    drawEyes(bitmojiX,bitmojiY,bitmojiHeight);
+    drawMouth(bitmojiX,bitmojiY,bitmojiHeight);
+    drawHat(bitmojiX,bitmojiY,bitmojiHeight);
+};
+
+
+var Bitmoji = function(x, y) {
+    this.x = x;
+    this.y = y;
+};
+
+Bitmoji.prototype.draw = function() {
+    this.y = constrain(this.y+con, 200, height - 60);
+    
+    for (var i = 0; i < ships.length; i++) {
+        if (this.x > ships[i].x-3 && this.x <= ships[i].x) {
+            score++;
+        }
+    }
+  
+    
+    if (keyIsPressed && keyCode === DOWN) {
+        drawBitmojiDuck(this.x, this.y-19, 40, 40);
+        con = 10;
+    } else {
+        drawBitmoji(this.x, this.y-19,40);
+        con = 1;
+    }
+    
+};
+
+var isBitmojiJumping = false;
+Bitmoji.prototype.hop = function() {
+    this.y -= 200;
+    isBitmojiJumping = true;
+};     
+ 
+Bitmoji.prototype.fall = function() {
+    this.y += (0.0000000001);
+    isBitmojiJumping = false;
+};
+
+
+
+//Shipgrabs
+
+
+
+
+Bitmoji.prototype.checkForShipGrab = function(ship) {
+    if (keyIsPressed && keyCode === DOWN)
+     {
+        if ((ship.x >= this.x-50 && ship.x <= (this.x + 10)) &&
+        (ship.y >= this.y-50 && ship.y <= (this.y + 10)))
+        {
+            ship.y = -400;
+            lives--;
+            score--;
+        }
+     }
+     else if ((ship.x >= this.x-50 && ship.x <= (this.x + 10)) &&
+        (ship.y >= this.y-105 && ship.y <= (this.y + 10))) 
+    {
+        ship.y = -400;
+        lives--;
+        score--;
+    }
+};
+
+JsEmoji.prototype.checkForShipGrab = function(ship) {
+     if (keyIsPressed && keyCode === DOWN)
+     {
+        if ((ship.x >= this.x-50 && ship.x <= (this.x + 10)) &&
+        (ship.y >= this.y-50 && ship.y <= (this.y + 10)))
+        {
+            ship.y = -400;
+            lives--;
+            score--;
+        }
+     }
+     else if ((ship.x >= this.x-50 && ship.x <= (this.x + 10)) &&
+        (ship.y >= this.y-105 && ship.y <= (this.y + 10))) 
+    {
+        ship.y = -400;
+        lives--;
+        score--;
+    }
+};
+
+// Button Class
+var Button = function(config) {
+    this.x = config.x || 0;
+    this.y = config.y || 0;
+    this.width = config.width || 150;
+    this.height = config.height || 50;
+    this.label = config.label || "Click";
+    this.onClick = config.onClick || function() {};
+    this.bgColor = config.bgColor || color(255, 0, 0);
+};
+
+Button.prototype.draw = function() {
+    fill(this.bgColor);
+    rect(this.x, this.y, this.width, this.height, 5);
+    fill(0, 0, 0);
+    textSize(19);
+    textAlign(LEFT, TOP);
+    text(this.label, this.x+(this.width/4)+5, this.y+this.height/4);
+};
+
+Button.prototype.isMouseInside = function() {
+    return mouseX > this.x &&
+           mouseX < (this.x + this.width) &&
+           mouseY > this.y &&
+           mouseY < (this.y + this.height);
+};
+
+Button.prototype.handleMouseClick = function() {
+    if (this.isMouseInside()) {
+        this.onClick();
+    }
+};
+
+var startButton = new Button({
+    x: 125,
+    y: 265,
+    label: "START",
+    bgColor: color(27, 242, 220),
+    onClick: function() 
+    {
+        currentScene = 1;
+    }
+});
+
+var jsButton = new Button({
+    x: 48,
+    y: 160,
+    height: 141,
+    bgColor: color(214, 184, 252),
+    onClick: function() 
+    {
+        currentScene = 2;
+        //var characterChosen = ""
+    }
+});
+
+var jrButton = new Button({
+    x: 205,
+    y: 160,
+    height: 141,
+    bgColor: color(190, 247, 240),
+    onClick: function() 
+    {
+        currentScene = 3;
+    }
+});
+
+// Splash Screen
+var splashScreen= function ()
+{
+    background(239, 237, 242);
+    
+    drawBitmoji(364,32, 31);
+    drawBitREmoji(318,46,55);
+    
+    fill(54, 54, 54);
+    textAlign(CENTER, CENTER);
+    textSize(15);
+    text("By: Jordan Riendeau and Jasmine Soares", 200, 187);
+    textSize(40);
+    text("Obstacle Run", 200, 140);
+    textSize(12);
+    text("Press /SPACE/ to jump", 200, 230);
+    text("Press the /DOWN ARROW/ to duck", 200, 250);
+    startButton.draw();
+    
+};
+
+
+// Ship functions
+
+var Ship = function(x, y) {
+    this.x = x;
+    this.y = y;
+};
+
+Ship.prototype.draw = function() {
+    fill(89, 71, 0);
+    rectMode(CENTER);
+    image(getImage("space/beetleship"), this.x, this.y, 80, 80);
+};
+
+//Jordan's Bitmoji spot in game
+var Bitmoji = new Bitmoji(110, 340);
+
+
+// Ships 
+
+var ships = [];
+
+//Ships on the bottom
+for (var i = 0; i < numShips; i++) {  
+    ships.push(new Ship(i*((random(5,15))*numShips), 294));
+}
+
+//Ships at bitmoji head
+for (var i = 0; i < numShips; i++) {  
+    ships.push(new Ship(i*((random(5,15))*numShips), 238));
+}
+
+
+
+
+//Choose your player screen
+
+var chooseScreen = function ()
+{   
+    currentScene = 1;
+    background(209, 202, 202);
+   
+    fill(54, 54, 54);
+    textAlign(CENTER, CENTER);
+    textSize(30);
+    text("Choose your Character", 200, 125);
+    
+  
+    
+    jsButton.draw();
+    jrButton.draw();
+    
+    var iconEmojiX = 282;
+    var iconEmojiY = 222;
+    
+    drawBitmoji(iconEmojiX, iconEmojiY, 70);
+    drawBitREmoji(iconEmojiX - 139, iconEmojiY + 31, 124);
+};
+
+var stoneXs = [];
+for (var i = 0; i < 25; i++) {
+    stoneXs.push(i*20);
+}
+
+
+//GameScreens
+
+var jsGameScreen = function ()
+{   
+    currentScene = 2;
+    background(232, 183, 183);
+    
+    var m = millis();
+     for (var i = 0; i < ships.length; i++) {
+        ships[i].draw();
+        jsEmoji.checkForShipGrab(ships[i]);
+        ships[i].x -= 3;
+    }
+    if (ships[0].x > 400)
+    {stillPlaying= false;}
+    
+    textSize(18);
+    text("Lives : " + lives + " Remaining", 20, 30); 
+    text("Score: " + score, 20, 60);
+
+
+    
+      // draw the blocks
+    for (var i = 0; i < stoneXs.length; i++) {
+        image(getImage("cute/StoneBlock"), stoneXs[i], height*0.84, 20, 89);
+        // subtract one, so that they appear to move to left (hopper appears to move to right)
+        stoneXs[i] -= 1;
+        // Now move the blocks over once they wrap around
+        if (stoneXs[i] <= -20) {
+            stoneXs[i] = width;
+            
+
+        }
+    }
+   
+   
+    //making jumping time limit
+
+    //spacebar jump when playing
+    if (stillPlaying)
+        {
+        if (keyIsPressed && key.code === 32) {
+            if (!isJsJumping) {
+                jsEmoji.hop();
+        }
+        } else {
+            if (isJsJumping) {
+                jsEmoji.fall();
+                this.y += (1/9000);
+                }
+            }
+        }
+    jsEmoji.draw();
+    if (lives < 0)
+        {
+            stillPlaying = false;
+            currentScene =3;}
+};
+
+var jrGameScreen = function ()
+{   
+    currentScene = 3;
+    background(232, 183, 183);
+    
+    var m = millis();
+     for (var i = 0; i < ships.length; i++) {
+        ships[i].draw();
+        Bitmoji.checkForShipGrab(ships[i]);
+        ships[i].x -= 3;
+    }
+    if (ships[0].x > 400)
+    {stillPlaying= false;}
+    
+    textSize(18);
+    text("Lives : " + lives + " Remaining", 20, 30); 
+    text("Score: " + score, 20, 60);
+
+
+    
+      // draw the blocks
+    for (var i = 0; i < stoneXs.length; i++) {
+        image(getImage("cute/StoneBlock"), stoneXs[i], height*0.84, 20, 89);
+        // subtract one, so that they appear to move to left (hopper appears to move to right)
+        stoneXs[i] -= 1;
+        // Now move the blocks over once they wrap around
+        if (stoneXs[i] <= -20) {
+            stoneXs[i] = width;
+            
+
+        }
+    }
+   
+   
+    //making jumping time limit
+
+    //spacebar jump when playing
+    if (stillPlaying)
+        {
+        if (keyIsPressed && key.code === 32) {
+            if (!isJsJumping) {
+                Bitmoji.hop();
+        }
+        } else {
+            if (isJsJumping) {
+                Bitmoji.fall();
+                this.y += (1/9000);
+                }
+            }
+        }
+    Bitmoji.draw();
+    if (lives < 0)
+        {
+            stillPlaying = false;
+            currentScene =4;}
+};
+
+var endScreen= function ()
+{
+    currentScene = 4;
+    
+    
+    
+        background(237, 99, 99);
+        textAlign(CENTER, CENTER);
+        textSize(40);
+        
+        
+        noStroke();
+        fill(252, 159, 252);
+        
+   
+        background(237, 99, 99);
+         fill(0, 0, 0);
+        text ("Game Over", 200, 174);
+        text ("Your Score: "+ score, 200, 233);
+        fill(94, 22, 22);
+        rect(200, topMoverYpos, 400, 200); //pinkrect1
+        rect(200, bottomMoverYpos , 400, 200); //pinkrect2
+    
+        topMoverYpos--;
+        bottomMoverYpos++;
+    
+};
+
+
+mouseClicked = function()
+{
+    if (currentScene === 0) { 
+    startButton.handleMouseClick();
+    } else if (currentScene === 1) { 
+    jsButton.handleMouseClick();
+    jrButton.handleMouseClick();
+    }
+};
+draw= function() {
+    
+    if (currentScene === 0) { splashScreen(); }
+    else if (currentScene === 1) {chooseScreen();}
+    else if (currentScene === 2) {jsGameScreen();}
+    else if (currentScene === 3) {jrGameScreen();}
+    else if (currentScene === 4) {endScreen();}
+};
